@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import time
 
 
-def parse_video(file_name):
+def parse_video(file_name, size=-1):
     # type: (str) -> []
     vidcap = cv2.VideoCapture(file_name)
     # success, image = vidcap.read()
@@ -13,7 +13,10 @@ def parse_video(file_name):
     while success:
         success, image = vidcap.read()
         if success:
-            img_arr.append(image)  # save frame as JPEG file
+            if size >= 1:
+                img_arr.append(cv2e.resize(image, size))
+            else:
+                img_arr.append(image)  # save frame as JPEG file
     return img_arr
 
 
@@ -88,7 +91,34 @@ def show_vid(vid):
         cv2.waitKey(0)
 
 
-if __name__ == '__main__':
+def track_vid(video):
+    tracker = cv2.Tracker_create("MIL")
+
+    current_frame = video[0]
+
+    bbox = cv2.selectROI(current_frame, False)
+    op1 = (int(bbox[0]), int(bbox[1]))
+    op2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
+
+    still_go = tracker.init(current_frame, bbox)
+    del still_go
+
+    for img in video[1:]:
+        still_go, bbox = tracker.update(img)
+        if not still_go:
+            break
+        p1 = (int(bbox[0]), int(bbox[1]))
+        p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
+        cv2e.rect(img, p1, p2)
+        cv2e.rect(img, op1, op2, color=[0, 0, 255])
+        cv2.imshow('tracker', img)
+
+        k = cv2.waitKey(1) & 0xff
+        if k == 27:
+            break
+
+
+def std_main():
     print 'loading images'
 
     images = parse_video('video.mp4')
@@ -108,3 +138,8 @@ if __name__ == '__main__':
     print 'dispaling'
 
     show_vid(compares)
+
+
+if __name__ == '__main__':
+    images = parse_video("video.mp4", 720)
+    track_vid(images)
