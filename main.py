@@ -1,6 +1,5 @@
 import cv2
 import cv2extensions as cv2e
-import numpy as np
 from matplotlib import pyplot as plt
 import time
 
@@ -11,14 +10,10 @@ def parse_video(file_name):
     # success, image = vidcap.read()
     img_arr = []
     success = True
-    count = 0
-    while success and count <= 50:
-        count += 1
+    while success:
         success, image = vidcap.read()
         if success:
             img_arr.append(image)  # save frame as JPEG file
-            cv2.imshow('cool', cv2e.resize(image, 720))
-            cv2.waitKey(1)
     return img_arr
 
 
@@ -55,7 +50,7 @@ def main():
         plt.close()
 
 
-def show_campare(img1, img2):
+def compare_img(img1, img2):
     # Initiate SIFT detector
     sift = cv2.xfeatures2d.SIFT_create()
 
@@ -76,34 +71,40 @@ def show_campare(img1, img2):
     # cv2.drawMatchesKnn expects list of lists as matches.
     img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, good, flags=2, outImg=None)
 
-    plt.imshow(img3), plt.show()
-    time.sleep(1)
-    plt.close()
+    return img3
 
 
-def show_images(images):
-    from matplotlib import animation
-
-    fig = plt.figure()
-    init_img = images[0]
-    im = plt.imshow(init_img, cmap='gist_gray_r', vmin=0, vmax=1)
-
-    def init():
-        im.set_data(init_img)
-
-    def animate(i):
-        img = images[i]
-        im.set_data(img)
-        return im
-
-    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=len(images), interval=50)
-    plt.show(anim)
+def img_compare_vid(img, vid):
+    ret = []
+    for img_itr in vid:
+        new_img = compare_img(img, img_itr)
+        ret.append(new_img)
+    return ret
 
 
-def test():
-    parse_video('video.mp4')
+def show_vid(vid):
+    for vid_img in vid:
+        cv2.imshow('cool', vid_img)
+        cv2.waitKey(0)
 
 
 if __name__ == '__main__':
+    print 'loading images'
+
     images = parse_video('video.mp4')
-    show_images(images)
+
+    print 'resizing images'
+
+    new_images = [cv2e.resize(x, 720) for x in images]
+
+    print 'loading refrence'
+
+    sighn = cv2.imread("arrowsighn.jpg")
+
+    print 'compareing'
+
+    compares = img_compare_vid(sighn, new_images)
+
+    print 'dispaling'
+
+    show_vid(compares)
