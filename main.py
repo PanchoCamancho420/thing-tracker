@@ -17,6 +17,8 @@ def parse_video(file_name, size=-1):
                 img_arr.append(cv2e.resize(image, size))
             else:
                 img_arr.append(image)  # save frame as JPEG file
+    print 'parsed image'
+    print img_arr
     return img_arr
 
 
@@ -92,15 +94,23 @@ def show_vid(vid):
 
 
 def track_vid(video):
-    tracker = cv2.Tracker_create("MIL")
+    tracker = cv2.Tracker_create("BOOSTING")
+    print 'tracker created'
+    print tracker
 
     current_frame = video[0]
 
+    print 'current frame, before select'
+    print current_frame
+
     bbox = cv2.selectROI(current_frame, False)
+    # bbox = (100, 100, 200, 200)
     op1 = (int(bbox[0]), int(bbox[1]))
     op2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
 
     still_go = tracker.init(current_frame, bbox)
+    print "tracker intilize status", still_go
+    print tracker
     del still_go
 
     for img in video[1:]:
@@ -118,7 +128,7 @@ def track_vid(video):
             break
 
 
-def std_main():
+def std_main():  # unused
     print 'loading images'
 
     images = parse_video('video.mp4')
@@ -141,5 +151,5 @@ def std_main():
 
 
 if __name__ == '__main__':
-    images = parse_video("video.mp4", 720)
+    images = parse_video("vid3.mp4", 720)
     track_vid(images)
