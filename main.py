@@ -106,8 +106,9 @@ def track_vid(video):
     print 'current frame, before select'
     print current_frame
 
-    bbox = cv2.selectROI(current_frame, False)
-    # bbox = (100, 100, 200, 200)
+    # bbox = cv2.selectROI(current_frame, False)
+    bbox = (100, 100, 200, 200)
+    # removes roi so it works
     op1 = (int(bbox[0]), int(bbox[1]))
     op2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
 
