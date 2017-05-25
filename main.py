@@ -1,7 +1,10 @@
-import cv2
+#! /Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python
 import cv2extensions as cv2e
 from matplotlib import pyplot as plt
 import time
+
+
+import cv2
 
 
 def parse_video(file_name, size=-1):
@@ -151,5 +154,5 @@ def std_main():  # unused
 
 
 if __name__ == '__main__':
-    images = parse_video("vid3.mp4", 720)
+    images = parse_video("video.mp4", 720)
     track_vid(images)
